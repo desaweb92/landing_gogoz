@@ -72,21 +72,7 @@ const TestimonialsSection = () => {
         />
       </div>
 
-      {/* Espirales y curvas */}
-      <svg className="absolute w-full h-full pointer-events-none">
-        <path
-          d="M 50 100 Q 75 120, 100 100 T 150 100"
-          stroke="rgba(255, 105, 180, 0.5)"
-          strokeWidth="2"
-          fill="none"
-        />
-        <path
-          d="M 50 200 Q 75 220, 100 200 T 150 200"
-          stroke="rgba(138, 43, 226, 0.5)"
-          strokeWidth="2"
-          fill="none"
-        />
-      </svg>
+   
 
       {/* Contenido principal */}
       <motion.h2

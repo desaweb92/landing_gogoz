@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const AboutSection = () => {
   return (
-    <section id="about" className="w-full px-8 py-16 text-justify bg-gradient-to-t from-pink-200 to-purple-300 flex flex-col items-center justify-center">
+    <section id="about" className="z-[-10] relative w-full px-8 py-16 text-justify bg-gradient-to-t from-pink-200 to-purple-300 flex flex-col items-center justify-center">
     <div className="absolute inset-0">
         <motion.div
           className="w-12 h-12 bg-pink-500 rounded-full blur-lg opacity-70"
