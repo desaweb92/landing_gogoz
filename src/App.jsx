@@ -6,17 +6,20 @@ import ServicesSection from './components/ServicesSection';
 import TestimonialsSection from './components/TestimonialsSection';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import Layout from './components/Layout';
 
 const App = () => {
   return (
     <div>
-      <Header />
+       <Layout>
+      {/* <Header /> */}
       <HeroSection />
       <AboutSection />
       <ServicesSection />
       <TestimonialsSection />
       <Contact />
       <Footer />
+      </Layout>
     </div>
   );
 };
