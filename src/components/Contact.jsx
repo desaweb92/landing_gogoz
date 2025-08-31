@@ -2,10 +2,34 @@ import React, { useRef } from "react";
 import { motion, useAnimation, useInView } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { FaFacebook, FaInstagram, FaTwitter, FaHeart } from "react-icons/fa";
+import { IoMail } from "react-icons/io5";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Contact = () => {
+   const socialLinks = [
+      {
+        icon: <FaFacebook className="text-blue-600" size={20} />,
+        href: "https://facebook.com",
+        bg: "bg-blue-100 hover:bg-blue-200",
+      },
+      {
+        icon: <FaInstagram className="text-pink-600" size={20} />,
+        href: "https://instagram.com",
+        bg: "bg-pink-100 hover:bg-pink-200",
+      },
+      {
+        icon: <FaTwitter className="text-blue-400" size={20} />,
+        href: "https://twitter.com",
+        bg: "bg-blue-100 hover:bg-blue-200",
+      },
+      {
+        icon: <IoMail className="text-red-500" size={20} />,
+        href: "mailto:contacto@gogoz.com",
+        bg: "bg-red-100 hover:bg-red-200",
+      },
+    ];
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: false, amount: 0.2 });
   const controls = useAnimation();
@@ -317,41 +341,35 @@ const Contact = () => {
                 </motion.div>
               ))}
 
-              {/* Redes sociales */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.1 }}
-                className="mt-8 pt-6 border-t border-[#FF2A6D]/30 text-center"
-              >
-                <h4 className=" text-white mb-4" style={{ textShadow: "0 0 5px rgba(179, 107, 227, 0.5)" }}>
-                  SÍGUENOS EN REDES
-                </h4>
-                <div className="flex justify-center gap-4">
-                  {[
-                    { name: "facebook", color: "#3b5998" },
-                    { name: "instagram", color: "#E1306C" },
-                    { name: "twitter", color: "#1DA1F2" },
-                    { name: "whatsapp", color: "#25D366" },
-                  ].map((social, i) => (
-                    <motion.a
-                      key={social.name}
-                      href="#"
-                      className="p-3 rounded-full bg-gray-700/50 border border-[#FF2A6D]/30"
-                      whileHover={{ y: -5, scale: 1.1, boxShadow: "0 0 10px rgba(179, 107, 227, 0.5)" }}
-                      whileTap={{ scale: 0.9 }}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 1.2 + i * 0.1 }}
-                    >
-                      <div
-                        className="w-5 h-5 rounded-full"
-                        style={{ backgroundColor: social.color }}
-                      />
-                    </motion.a>
-                  ))}
-                </div>
-              </motion.div>
+          {/* Redes sociales */}
+                  <div className="flex flex-col items-center md:items-end gap-4">
+                    <h3 className="text-lg text-white">
+                      Síguenos en redes
+                    </h3>
+                    <div className="flex gap-3">
+                      {socialLinks.map((link, index) => (
+                        <motion.a
+                          key={index}
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ y: -4, scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={`${link.bg} p-3 rounded-full transition-colors`}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ 
+                            type: "spring",
+                            stiffness: 300,
+                            delay: index * 0.1
+                          }}
+                        >
+                          {link.icon}
+                        </motion.a>
+                      ))}
+                    </div>
+                  </div>
+
             </div>
           </motion.div>
         </div>
