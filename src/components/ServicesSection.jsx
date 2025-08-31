@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Fiesta from "../assets/images/fiesta.jpg";
 import Ancheta from "../assets/images/Ancheta.jpg";
 import Desayuno from "../assets/images/Desayuno.jpg";
-import Pocillos from "../assets/images/pocillos.jpg";
+import Pocillos from "../assets/images/taza-negra.png";
 import Afiche from "../assets/images/Afiche.jpg";
 import Personalizada from "../assets/images/Personalizada.jpg";
 
