@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const testimonials = [
   {
-    text: "¡Los detalles personalizados de GOGO'Z hicieron que mi evento fuera inolvidable! La atención al detalle y la creatividad superaron todas mis expectativas.",
+    text: "¡Los detalles personalizados de GOGO'Z hicieron que mi evento fuera INOLVIDABLE! La atención al detalle y la creatividad superaron todas mis expectativas.",
     name: "Juan P.",
     icon: image1,
     role: "Cliente de Evento"
@@ -37,7 +37,7 @@ const testimonials = [
     role: "Organizadora de Eventos"
   },
   {
-    text: "GOGO'Z hizo que mi cumpleaños fuera mágico. ¡Gracias por todo! Las decoraciones y detalles personalizados dejaron a todos mis invitados sin palabras.",
+    text: "GOGO'Z hizo que mi cumpleaños fuera MÁGICO. ¡Gracias por todo! Las decoraciones y detalles personalizados dejaron a todos sin palabras.",
     name: "Carlos R.",
     icon: image5,
     role: "Cliente Particular"
@@ -52,21 +52,34 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(true);
   const controls = useAnimation();
-  const sectionRef = React.useRef(null);
+  const sectionRef = useRef(null);
+  const cassetteRef = useRef(null);
 
+  // Animación de fragmentos rotos con GSAP
   useEffect(() => {
-    // Animación de burbujas con GSAP
-    const bubbles = gsap.utils.toArray(".testimonial-bubble");
-    bubbles.forEach((bubble, i) => {
-      gsap.to(bubble, {
-        y: i % 2 === 0 ? -15 : 15,
-        duration: 3 + i,
+    const fragments = gsap.utils.toArray(".testimonial-fragment");
+    fragments.forEach((fragment, i) => {
+      gsap.to(fragment, {
+        y: i % 2 === 0 ? -25 : 25,
+        x: i % 3 === 0 ? -15 : 15,
+        rotation: (i * 10) % 20 - 10,
+        duration: 4 + i,
         repeat: -1,
         yoyo: true,
-        ease: "sine.inOut"
+        ease: "sine.inOut",
       });
+    });
+
+    // Efecto de "glitch" en el título
+    gsap.to(".glitch-text", {
+      skewX: 2,
+      duration: 0.1,
+      repeat: -1,
+      yoyo: true,
+      ease: "none",
+      delay: 0.5,
     });
 
     // Animación de scroll
@@ -74,37 +87,41 @@ const TestimonialsSection = () => {
       trigger: sectionRef.current,
       start: "top center",
       onEnter: () => controls.start("visible"),
-      onLeaveBack: () => controls.start("hidden")
     });
   }, []);
 
+  // Auto-rotate testimonials
+  useEffect(() => {
+    let interval;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+      }, 5000);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
   const nextTestimonial = () => {
-    setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);
   };
 
   const prevTestimonial = () => {
-    setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
-  // Auto-rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      nextTestimonial();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [currentIndex]);
+  const goToTestimonial = (index) => {
+    setCurrentIndex(index);
+  };
 
+  // Variantes de animación
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
+      },
+    },
   };
 
   const titleVariants = {
@@ -114,60 +131,119 @@ const TestimonialsSection = () => {
       y: 0,
       transition: {
         type: "spring",
-        stiffness: 100,
-        damping: 10
-      }
-    }
+        stiffness: 150,
+        damping: 12,
+      },
+    },
   };
 
   const testimonialVariants = {
-    enter: (direction) => ({
-      x: direction > 0 ? 100 : -100,
-      opacity: 0
-    }),
-    center: {
-      x: 0,
+    initial: {
+      opacity: 0,
+      scale: 0.8,
+      rotate: -5,
+    },
+    animate: {
       opacity: 1,
+      scale: 1,
+      rotate: 0,
       transition: {
         type: "spring",
         stiffness: 300,
-        damping: 20
-      }
+        damping: 20,
+      },
     },
-    exit: (direction) => ({
-      x: direction > 0 ? -100 : 100,
+    exit: {
       opacity: 0,
+      scale: 0.8,
+      rotate: 5,
       transition: {
-        duration: 0.3
-      }
-    })
+        duration: 0.3,
+      },
+    },
   };
+
+  const cassetteVariants = {
+    hover: {
+      scale: 1.02,
+      boxShadow: "0 0 20px rgba(179, 107, 227, 0.6)",
+      transition: {
+        type: "spring",
+        stiffness: 400,
+      },
+    },
+  };
+
+  // Fragmentos rotos para decoración
+  const fragments = [
+    { size: "w-10 h-10", top: "10%", left: "15%" },
+    { size: "w-8 h-8", top: "70%", left: "10%" },
+    { size: "w-12 h-12", top: "30%", right: "20%" },
+    { size: "w-6 h-6", bottom: "20%", left: "70%" },
+    { size: "w-9 h-9", bottom: "60%", right: "15%" },
+    { size: "w-7 h-7", top: "50%", right: "5%" },
+  ];
 
   return (
     <section
       id="testimonials"
       ref={sectionRef}
-      className="relative px-6 py-20 md:py-28 overflow-hidden bg-gradient-to-b from-pink-50 to-purple-100"
+      className="relative px-6 py-20 md:py-28 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 text-white"
     >
-      {/* Elementos decorativos flotantes */}
+      {/* Definición del degradado para los fragmentos */}
+      <svg className="absolute w-0 h-0" aria-hidden="true">
+        <defs>
+          <linearGradient id="fragment-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FF2A6D" />
+            <stop offset="100%" stopColor="#6D8EFB" />
+          </linearGradient>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+      </svg>
+
+      {/* Textura de fondo (ruido de vinilo) */}
+      <div
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.03) 0.5px, transparent 0.5px),
+            radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.03) 0.5px, transparent 0.5px)
+          `,
+          backgroundSize: "50px 50px",
+        }}
+      />
+
+      {/* Fragmentos rotos flotantes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(4)].map((_, i) => (
+        {fragments.map((fragment, i) => (
           <motion.div
             key={i}
-            className={`testimonial-bubble absolute rounded-full opacity-20 blur-lg ${
-              i % 3 === 0 ? 'bg-pink-300 w-16 h-16' : 
-              i % 2 === 0 ? 'bg-purple-300 w-14 h-14' : 'bg-blue-300 w-12 h-12'
-            }`}
+            className={`testimonial-fragment absolute ${fragment.size} opacity-50`}
             style={{
-              top: `${10 + i * 15}%`,
-              left: `${5 + i * 10}%`,
-              right: i > 1 ? `${5 + (i-2) * 15}%` : 'auto'
+              top: fragment.top,
+              left: fragment.left,
+              right: fragment.right,
+              bottom: fragment.bottom,
             }}
-          />
+          >
+            <svg className="w-full h-full" viewBox="0 0 20 20" fill="none">
+              <path
+                d={i % 2 === 0 ? "M3 3 L12 7 L7 15 L3 3 Z" : "M18 3 L10 10 L18 17 L18 3 Z"}
+                fill="url(#fragment-gradient)"
+                stroke="white"
+                strokeWidth="0.3"
+                filter="url(#glow)"
+              />
+            </svg>
+          </motion.div>
         ))}
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      {/* Contenido principal */}
+      <div className="max-w-5xl mx-auto relative z-10">
         <motion.div
           initial="hidden"
           animate={controls}
@@ -176,100 +252,144 @@ const TestimonialsSection = () => {
         >
           <motion.h2
             variants={titleVariants}
-            className="text-4xl md:text-5xl font-bold text-purple-600 font-cherry-bomb-one mb-4"
+            className="text-4xl md:text-5xl mb-4 glitch-text"
+            style={{
+              textShadow: "0 0 10px rgba(255, 42, 109, 0.5), 0 0 20px rgba(109, 142, 251, 0.3)",
+            }}
           >
-            Lo que dicen nuestros clientes
+            LO QUE DICEN <span className="text-[#FF2A6D]">NUESTROS CLIENTES</span>
           </motion.h2>
-          <motion.div 
-            className="w-24 h-1 bg-pink-400 mx-auto rounded-full"
+          <motion.div
+            className="w-32 h-1 mx-auto rounded-full bg-gradient-to-r from-[#FF2A6D] to-[#6D8EFB]"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           />
         </motion.div>
 
-        <div className="relative h-96 mb-6 md:h-80">
-          <AnimatePresence custom={direction} mode="wait">
-            <motion.div
-              key={currentIndex}
-              custom={direction}
-              variants={testimonialVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              className="absolute inset-x-0 top-0 bg-white/80 backdrop-blur-sm p-8 md:p-10 rounded-2xl shadow-sm border border-white max-w-3xl mx-auto"
-            >
-              <div className="flex flex-col md:flex-row items-center gap-6">
+        {/* Contenedor del slider con diseño de cassette */}
+        <div className="relative">
+          <motion.div
+            ref={cassetteRef}
+            className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border-2 border-[#FF2A6D]/30 shadow-lg"
+            variants={cassetteVariants}
+            whileHover="hover"
+          >
+            {/* Ventana del cassette (donde va el testimonio) */}
+            <div className="relative h-80 mb-6 bg-gray-900/30 rounded-lg p-6 border-2 border-[#6D8EFB]/30 overflow-hidden">
+              <AnimatePresence mode="wait">
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="shrink-0"
+                  key={currentIndex}
+                  variants={testimonialVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="absolute inset-0 flex flex-col md:flex-row items-center gap-6 p-4"
                 >
-                  <img
-                    src={testimonials[currentIndex].icon}
-                    alt={testimonials[currentIndex].name}
-                    className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-pink-200 shadow-md"
-                  />
-                </motion.div>
-                <div className="text-left">
-                  <motion.p 
-                    className="italic text-lg md:text-xl text-gray-700 mb-6 leading-relaxed"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
+                  {/* Imagen con efecto polaroid roto */}
+                  <motion.div
+                    whileHover={{ scale: 1.05, rotate: 1 }}
+                    className="shrink-0 relative"
                   >
-                    "{testimonials[currentIndex].text}"
-                  </motion.p>
-                  <div>
-                    <p className="font-semibold text-purple-600">{testimonials[currentIndex].name}</p>
-                    <p className="text-sm text-gray-500">{testimonials[currentIndex].role}</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+                    <div className="absolute -top-2 -left-2 w-32 h-32 md:w-40 md:h-40 bg-white/10 rounded-lg transform -rotate-3 border-2 border-[#FF2A6D]"></div>
+                    <img
+                      src={testimonials[currentIndex].icon}
+                      alt={testimonials[currentIndex].name}
+                      className="relative w-32 h-32 md:w-40 md:h-40 rounded-lg object-cover border-4 border-white/20 shadow-lg"
+                    />
+                  </motion.div>
 
-        {/* Controles de navegación */}
-        <div className="flex justify-center gap-4 mt-8">
-          <motion.button
-            onClick={prevTestimonial}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="p-3 bg-pink-500 text-white rounded-full shadow-md hover:bg-pink-600 transition-colors"
-            aria-label="Testimonio anterior"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </motion.button>
-          
-          <div className="flex items-center gap-2">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setDirection(index > currentIndex ? 1 : -1);
-                  setCurrentIndex(index);
-                }}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  index === currentIndex ? 'bg-purple-600' : 'bg-purple-300'
-                }`}
-                aria-label={`Ir al testimonio ${index + 1}`}
-              />
-            ))}
-          </div>
-          
-          <motion.button
-            onClick={nextTestimonial}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="p-3 bg-pink-500 text-white rounded-full shadow-md hover:bg-pink-600 transition-colors"
-            aria-label="Siguiente testimonio"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </motion.button>
+                  {/* Texto del testimonio */}
+                  <div className="flex-1 bg-gray-900/40 backdrop-blur-sm p-6 rounded-lg border border-[#6D8EFB]/30">
+                    <motion.p
+                      className="text-lg md:text-xl text-white/90 mb-4 leading-relaxed italic"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      "{testimonials[currentIndex].text}"
+                    </motion.p>
+                    <div>
+                      <p className=" text-[#FF2A6D]">{testimonials[currentIndex].name}</p>
+                      <p className="text-sm text-white/70">{testimonials[currentIndex].role}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Efecto de "cinta magnética" */}
+              <div className="absolute -left-4 top-1/2 w-4 h-20 bg-gradient-to-b from-transparent via-[#FF2A6D]/50 to-transparent rounded-full"></div>
+              <div className="absolute -right-4 top-1/2 w-4 h-20 bg-gradient-to-b from-transparent via-[#6D8EFB]/50 to-transparent rounded-full"></div>
+            </div>
+
+            {/* Controles del cassette */}
+            <div className="flex justify-between items-center mt-6">
+              {/* Botones de navegación con estilo de cassette */}
+              <div className="flex gap-4">
+                <motion.button
+                  onClick={prevTestimonial}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-12 h-12 rounded-full bg-gray-800 border-2 border-[#FF2A6D] flex items-center justify-center shadow-md"
+                  aria-label="Testimonio anterior"
+                >
+                  <svg className="w-6 h-6 text-[#FF2A6D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </motion.button>
+
+                <motion.button
+                  onClick={nextTestimonial}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-12 h-12 rounded-full bg-gray-800 border-2 border-[#6D8EFB] flex items-center justify-center shadow-md"
+                  aria-label="Siguiente testimonio"
+                >
+                  <svg className="w-6 h-6 text-[#6D8EFB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </motion.button>
+              </div>
+
+              {/* Botón de play/pausa */}
+              <motion.button
+                onClick={() => setIsPlaying(!isPlaying)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="w-12 h-12 rounded-full bg-gradient-to-r from-[#FF2A6D] to-[#6D8EFB] flex items-center justify-center shadow-lg"
+                aria-label={isPlaying ? "Pausar" : "Reproducir"}
+              >
+                {isPlaying ? (
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+              </motion.button>
+
+              {/* Indicadores de posición */}
+              <div className="flex gap-2">
+                {testimonials.map((_, index) => (
+                  <motion.button
+                    key={index}
+                    onClick={() => goToTestimonial(index)}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      index === currentIndex
+                        ? "bg-gradient-to-r from-[#FF2A6D] to-[#6D8EFB] w-6"
+                        : "bg-gray-600"
+                    }`}
+                    aria-label={`Ir al testimonio ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>

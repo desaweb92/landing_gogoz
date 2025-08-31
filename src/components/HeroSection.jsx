@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { motion, useAnimation } from 'framer-motion';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React, { useEffect, useRef } from "react";
+import { motion, useAnimation } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Logo from "../assets/images/logo-gogoz.png";
 
 // Registrar el plugin de GSAP
@@ -11,7 +11,6 @@ const HeroSection = () => {
   const heroRef = useRef(null);
   const controls = useAnimation();
   const floatingElements = useRef([]);
-  const textControls = useAnimation();
   const videoRef = useRef(null);
 
   // Efecto de animación inicial con GSAP
@@ -22,7 +21,7 @@ const HeroSection = () => {
       opacity: 0,
       duration: 1.5,
       ease: "elastic.out(1, 0.5)",
-      delay: 0.3
+      delay: 0.3,
     });
 
     // Animación escalonada del texto
@@ -32,211 +31,303 @@ const HeroSection = () => {
       stagger: 0.2,
       duration: 1,
       delay: 0.8,
-      ease: "power3.out"
+      ease: "power3.out",
     });
 
-    // Animación de elementos flotantes
+    // Animación de fragmentos rotos (efecto "glitch" sutil)
     floatingElements.current.forEach((el, index) => {
       gsap.to(el, {
-        y: index % 2 === 0 ? -30 : 30,
-        duration: 3 + index,
+        y: index % 2 === 0 ? -25 : 25,
+        x: index % 3 === 0 ? 10 : -10,
+        rotation: (index * 5) % 15 - 7,
+        duration: 2 + index,
         repeat: -1,
         yoyo: true,
-        ease: "sine.inOut"
+        ease: "sine.inOut",
       });
     });
 
     // Efecto de parallax para el video
     gsap.to(videoRef.current, {
-      y: 100,
+      y: 50,
       scrollTrigger: {
         trigger: heroRef.current,
         start: "top top",
         end: "bottom top",
-        scrub: true
-      }
+        scrub: true,
+      },
     });
 
-    // Animación de brillo intermitente
+    // Animación de brillo intermitente (efecto neón)
     const blinkInterval = setInterval(() => {
       controls.start({
-        opacity: [0.8, 1, 0.8],
-        transition: { duration: 2, ease: "easeInOut" }
+        textShadow: [
+          "0 0 5px rgba(255, 42, 109, 0.5), 0 0 10px rgba(109, 142, 251, 0.5)",
+          "0 0 10px rgba(255, 42, 109, 0.8), 0 0 15px rgba(109, 142, 251, 0.8)",
+          "0 0 5px rgba(255, 42, 109, 0.5), 0 0 10px rgba(109, 142, 251, 0.5)",
+        ],
+        transition: { duration: 1.5, ease: "easeInOut" },
       });
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(blinkInterval);
   }, []);
 
   // Variantes para animación de texto
   const textVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30 },
     visible: (i) => ({
       opacity: 1,
       y: 0,
       transition: {
         delay: i * 0.2 + 0.8,
         duration: 0.8,
-        ease: "easeOut"
-      }
-    })
+        ease: "easeOut",
+      },
+    }),
   };
 
-  // Elementos flotantes con posiciones aleatorias
-  const floatingShapes = [
-    { color: "bg-pink-400", size: "w-16 h-16", left: "20%", top: "15%" },
-    { color: "bg-purple-400", size: "w-12 h-12", right: "25%", top: "40%" },
-    { color: "bg-blue-400", size: "w-20 h-20", left: "10%", bottom: "20%" },
-    { color: "bg-indigo-400", size: "w-14 h-14", right: "15%", bottom: "30%" }
+  // Fragmentos rotos (inspirados en el logo)
+  const brokenFragments = [
+    {
+      shape: (
+        <svg className="w-full h-full" viewBox="0 0 20 20" fill="none">
+          <path
+            d="M3 3 L12 7 L7 15 L3 3 Z"
+            fill="url(#fragment-gradient)"
+            stroke="white"
+            strokeWidth="0.3"
+          />
+        </svg>
+      ),
+      size: "w-10 h-10",
+      left: "15%",
+      top: "20%",
+    },
+    {
+      shape: (
+        <svg className="w-full h-full" viewBox="0 0 20 20" fill="none">
+          <path
+            d="M18 3 L10 10 L18 17 L18 3 Z"
+            fill="url(#fragment-gradient)"
+            stroke="white"
+            strokeWidth="0.3"
+          />
+        </svg>
+      ),
+      size: "w-12 h-12",
+      right: "20%",
+      top: "30%",
+    },
+    {
+      shape: (
+        <svg className="w-full h-full" viewBox="0 0 20 20" fill="none">
+          <path
+            d="M5 5 L15 2 L10 12 L5 5 Z"
+            fill="url(#fragment-gradient)"
+            stroke="white"
+            strokeWidth="0.3"
+          />
+        </svg>
+      ),
+      size: "w-8 h-8",
+      left: "10%",
+      bottom: "25%",
+    },
+    {
+      shape: (
+        <svg className="w-full h-full" viewBox="0 0 20 20" fill="none">
+          <path
+            d="M2 18 L10 10 L18 18 L2 18 Z"
+            fill="url(#fragment-gradient)"
+            stroke="white"
+            strokeWidth="0.3"
+          />
+        </svg>
+      ),
+      size: "w-14 h-14",
+      right: "10%",
+      bottom: "15%",
+    },
   ];
 
   return (
     <section
       ref={heroRef}
-      className="relative h-screen overflow-hidden bg-gradient-to-br from-purple-700 via-indigo-700 to-blue-600"
+      className="relative h-screen overflow-hidden bg-gradient-to-br from-gray-50 to-white"
     >
-      {/* Video de fondo con overlay */}
-      <motion.div
-        animate={controls}
-        className="absolute inset-0 overflow-hidden"
-      >
+      {/* Definición del degradado para los fragmentos (rosa y azul) */}
+      <svg className="absolute w-0 h-0" aria-hidden="true">
+        <defs>
+          <linearGradient id="fragment-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FF2A6D" />
+            <stop offset="100%" stopColor="#6D8EFB" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* Video de fondo con overlay claro y textura "rota" */}
+      <motion.div animate={controls} className="absolute inset-0 overflow-hidden">
         <video
           ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
+          className="absolute inset-0 w-full h-full object-cover opacity-15"
         >
           <source src="/videos/promo-video.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-blue-900/20" />
+        <div className="absolute inset-0 bg-white/90" />
+        {/* Textura sutil de líneas rotas (como grietas) */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.03) 2px,
+                rgba(0, 0, 0, 0.03) 4px
+              ),
+              repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 3px,
+                rgba(0, 0, 0, 0.03) 3px,
+                rgba(0, 0, 0, 0.03) 6px
+              )
+            `,
+          }}
+        />
       </motion.div>
 
-      {/* Elementos decorativos flotantes */}
+      {/* Fragmentos rotos flotantes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {floatingShapes.map((shape, i) => (
+        {brokenFragments.map((fragment, i) => (
           <motion.div
             key={i}
-            ref={el => floatingElements.current[i] = el}
-            className={`${shape.color} ${shape.size} rounded-full absolute opacity-20 blur-xl`}
+            ref={(el) => (floatingElements.current[i] = el)}
+            className={`absolute ${fragment.size} opacity-60`}
             style={{
-              left: shape.left,
-              right: shape.right,
-              top: shape.top,
-              bottom: shape.bottom
+              left: fragment.left,
+              right: fragment.right,
+              top: fragment.top,
+              bottom: fragment.bottom,
             }}
-            initial={{ y: i % 2 === 0 ? -50 : 50 }}
-          />
+            initial={{ y: i % 2 === 0 ? -60 : 60, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 + i * 0.2, duration: 1.2 }}
+          >
+            {fragment.shape}
+          </motion.div>
         ))}
       </div>
 
-      {/* Líneas decorativas animadas */}
+      {/* Líneas afiladas animadas (como rayos o grietas) */}
       <svg className="absolute w-full h-full pointer-events-none">
+        {/* Rayo en diagonal (como en el logo) */}
         <motion.path
-          d="M 100 200 Q 150 150, 200 200 T 300 200"
-          stroke="rgba(255, 255, 255, 0.2)"
-          strokeWidth="2"
+          d="M 100 150 L 150 100 L 180 130 L 220 90 L 250 120"
+          stroke="url(#fragment-gradient)"
+          strokeWidth="1.2"
           fill="none"
+          strokeLinecap="round"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ duration: 2, delay: 1 }}
+          transition={{ duration: 1.8, delay: 1 }}
         />
+        {/* Línea quebrada (efecto glitch) */}
         <motion.path
-          d="M 50 400 Q 100 350, 150 400 T 250 400"
-          stroke="rgba(255, 255, 255, 0.2)"
-          strokeWidth="2"
+          d="M 50 300 L 80 280 L 110 310 L 140 290 L 170 320"
+          stroke="rgba(109, 142, 251, 0.7)"
+          strokeWidth="1.5"
           fill="none"
+          strokeDasharray="3, 2"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ duration: 2, delay: 1.5 }}
+          transition={{ duration: 2, delay: 1.3 }}
         />
       </svg>
 
       {/* Contenido principal */}
       <div className="relative h-full flex flex-col justify-center items-center z-10 px-4">
-        {/* Logo con animación */}
+        {/* Logo con borde fragmentado */}
         <motion.div
-          className="hero-logo mb-8"
+          className="hero-logo mb-6 p-2 border-2 border-[#FF2A6D] rounded-lg shadow-md bg-white"
+          style={{
+            clipPath: "polygon(5% 5%, 95% 5%, 98% 20%, 90% 90%, 20% 80%, 5% 60%)",
+          }}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", damping: 10 }}
         >
-          <img
-            src={Logo}
-            alt="GOGO'Z Logo"
-            className="w-64 md:w-80 h-auto drop-shadow-xl"
-          />
         </motion.div>
 
-        {/* Texto con animación escalonada */}
-        <div className="text-center space-y-6">
+        {/* Texto con degradado y efecto neón */}
+        <div className="text-center space-y-4">
           <motion.h1
-            className="hero-text text-5xl md:text-7xl font-bold text-white font-cherry-bomb-one drop-shadow-lg"
+            className="hero-text text-4xl md:text-6xl font-bold"
+            style={{
+              background: "linear-gradient(to right, #FF2A6D, #6D8EFB)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
             custom={0}
             initial="hidden"
             animate="visible"
             variants={textVariants}
           >
-            Detalles Personalizados
+            DISEÑOS QUE ROMPEN MOLDES
           </motion.h1>
           <motion.p
-            className="hero-text text-2xl md:text-3xl text-white/90 font-estonia max-w-2xl mx-auto"
+            className="hero-text text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto"
             custom={1}
             initial="hidden"
             animate="visible"
             variants={textVariants}
           >
-            Haz que cada momento sea especial con GOGO'Z
+            Sublimación con estilo único y actitud rebelde
           </motion.p>
-          <motion.div
-            className="hero-text"
-            custom={2}
-            initial="hidden"
-            animate="visible"
-            variants={textVariants}
-          >
+          <motion.div custom={2} initial="hidden" animate="visible" variants={textVariants}>
             <motion.button
               whileHover={{
                 scale: 1.05,
-                boxShadow: "0 5px 15px rgba(255, 255, 255, 0.3)"
+                boxShadow: "0 0 20px rgba(255, 42, 109, 0.4)",
+                background: "linear-gradient(to right, #FF2A6D, #6D8EFB)",
               }}
               whileTap={{ scale: 0.95 }}
-              className="mt-8 px-8 py-3 bg-white text-purple-700 rounded-full font-medium text-lg shadow-lg hover:bg-purple-100 transition-colors"
+              className="mt-6 px-8 py-3 bg-gradient-to-r from-[#FF2A6D] to-[#6D8EFB] text-white rounded-full font-medium text-lg shadow-lg transition-all"
             >
-              Descubre Más
+              ¡QUERO VER!
             </motion.button>
           </motion.div>
         </div>
+      </div> 
 
-        {/* Indicador de scroll */}
-        <motion.div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-          animate={{
-            y: [0, 10, 0],
-            opacity: [0.6, 1, 0.6]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          <svg
-            className="w-8 h-8 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
-        </motion.div>
-      </div>
+      {/* Indicador de scroll (estrella rota como en el logo) */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        animate={{
+          y: [0, 15, 0],
+          opacity: [0.5, 1, 0.5],
+        }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 3 L14 9 L19 10 L15 14 L16 19 L12 16 L8 19 L9 14 L5 10 L10 9 Z"
+            fill="url(#fragment-gradient)"
+            stroke="white"
+            strokeWidth="0.5"
+          />
+        </svg>
+      </motion.div>
     </section>
   );
 };
